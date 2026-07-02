@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #0a0f1c;
+  --color-ink-900: #0d1424;
+  --color-ink-850: #111a2e;
+  --color-ink-800: #16213a;
+  --color-ink-700: #1e2d4a;
+  --color-ink-600: #64748b;
+
+  --color-azure-300: #7dd3fc;
+  --color-azure-400: #38bdf8;
+  --color-azure-500: #0ea5e9;
+  --color-azure-600: #0284c7;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 100% -10%, rgba(56, 189, 248, 0.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(14, 165, 233, 0.06), transparent 55%),
+    var(--color-ink-950);
+  color: #e2e8f0;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Thin, unobtrusive scrollbar to match the dark theme */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+}

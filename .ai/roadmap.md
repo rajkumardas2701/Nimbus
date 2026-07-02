@@ -6,7 +6,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started
 - ✅ Developer Portal (apps/portal) — the Azure Portal for Nimbus
 - ✅ Platform API (services/api) — Python Function with `/health`
 - ✅ Portal → API health wiring (`/platform` status page)
-- ⬜ Cosmos DB wiring
+- ✅ Cosmos DB wiring — Learning Journal persists (serverless, keyless/AAD)
 - ⬜ Deploy portal + api to Azure
 
 ## Phase 1 — 100 users

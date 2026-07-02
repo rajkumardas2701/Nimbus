@@ -1,2 +1,9 @@
 # Azure Functions Python worker
 azure-functions
+
+# Data + identity (keyless Cosmos access)
+azure-cosmos
+azure-identity
+
+# Boundary validation
+pydantic

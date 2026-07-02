@@ -1,31 +1,14 @@
 import { PageHeader, Card } from "@/components/ui";
+import { getJournalEntries } from "@/lib/journal";
 
 export const metadata = { title: "Learning Journal" };
 
-type Entry = {
-  date: string;
-  title: string;
-  body: string;
-  tags: string[];
-};
+// Always fresh — reflects the latest entries persisted through the API.
+export const dynamic = "force-dynamic";
 
-// Newest first. Add an entry whenever a meaningful decision or lesson lands.
-const entries: Entry[] = [
-  {
-    date: "2026-07-02",
-    title: "Nimbus takes shape: the platform framing",
-    body: "Reframed the whole effort from 'portfolio project' to 'one cloud platform with many apps'. Scaffolded the monorepo, the .ai brain docs, and the Developer Portal. Backend language locked to Python for services/.",
-    tags: ["platform", "decision"],
-  },
-  {
-    date: "2026-07-02",
-    title: "Why start with the portal, not auth or AI",
-    body: "The portal is the front door every future capability plugs into. Building it first gives every later service a place to surface — and forces the platform's information architecture early.",
-    tags: ["architecture"],
-  },
-];
+export default async function JournalPage() {
+  const { entries, source } = await getJournalEntries();
 
-export default function JournalPage() {
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
@@ -34,9 +17,29 @@ export default function JournalPage() {
         lede="A running log of what changed and why — the human side of the platform's evolution. DDIA, system design, and Azure lessons land here as they happen."
       />
 
+      <div className="flex items-center gap-2 text-xs">
+        <span
+          className={[
+            "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1",
+            source === "api"
+              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+              : "border-white/10 bg-white/5 text-slate-400",
+          ].join(" ")}
+        >
+          <span
+            className={[
+              "h-1.5 w-1.5 rounded-full",
+              source === "api" ? "bg-emerald-400" : "bg-slate-500",
+            ].join(" ")}
+          />
+          {source === "api" ? "Live from Cosmos DB" : "Offline — local fallback"}
+        </span>
+        <span className="text-slate-600">{entries.length} entries</span>
+      </div>
+
       <div className="flex flex-col gap-4">
         {entries.map((entry) => (
-          <Card key={`${entry.date}-${entry.title}`}>
+          <Card key={entry.id}>
             <div className="flex items-center justify-between gap-3">
               <h2 className="font-medium text-white">{entry.title}</h2>
               <time className="shrink-0 font-mono text-xs text-slate-500">

@@ -40,7 +40,7 @@ export async function getJournalEntries(): Promise<JournalResult> {
   try {
     const res = await fetch(`${API_BASE}/api/journal`, {
       cache: "no-store",
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = (await res.json()) as { entries: JournalEntry[] };

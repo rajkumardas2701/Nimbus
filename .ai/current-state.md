@@ -5,7 +5,7 @@ _Update this whenever focus changes. The agent reads this first._
 **Last updated:** 2026-07-02
 
 ## Current focus
-Phase 0 foundation running locally with real data. Next: first Azure deploy + ADRs.
+Phase 0 COMPLETE — portal + API + Cosmos deployed to Azure. Next: ADRs, then Phase 1 auth.
 
 ## Phase
 Phase 0 — 10 users. Foundation.
@@ -30,14 +30,18 @@ Phase 0 — 10 users. Foundation.
 - Portal: `cd apps/portal; npm run dev` (http://localhost:3000)
 
 ## Next up
-1. First deploy to Azure (Static Web App + Function App + config).
-2. ADRs: 0002 health contract, 0003 Python vs C#, 0004 keyless Cosmos.
-3. Phase 1: Authentication (Entra ID / EasyAuth).
+1. ADRs: 0002 health contract, 0003 Python vs C#, 0004 keyless Cosmos, 0005 App Service vs SWA (meaningful URL).
+2. Phase 1: Authentication (Entra ID / EasyAuth).
+3. App Insights + GitHub Actions CI/CD (auto-deploy on push).
 
 ## Key resources (personal subscription)
 - Subscription: Visual Studio Enterprise `e6127a12-...` · tenant `fb3e7b7e-...`
 - Resource group: `nimbus-rg` (centralindia)
 - Cosmos: `nimbus-cosmos-qpfix1w4j5` (keyless) · endpoint set via `COSMOS_ENDPOINT`
+- **Live portal:** https://nimbus-portal.azurewebsites.net (App Service F1, `nimbus-plan`)
+- **Live API:** https://nimbus-platform-api.azurewebsites.net (Function App, Consumption)
+- Storage: `nimbusstoragz1s3h4` · Function App MI has Cosmos data-plane RBAC
+- Portal deploy: `next build` (standalone) → zip → `az webapp deploy`; API: `func azure functionapp publish`
 
 ## Parked / deferred
 - C# RAG prototype at `C:\ProjectRepos\Personal\ai-ops-assistant` — will be rewritten

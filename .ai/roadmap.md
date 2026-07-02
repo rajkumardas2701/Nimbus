@@ -7,7 +7,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started
 - ✅ Platform API (services/api) — Python Function with `/health`
 - ✅ Portal → API health wiring (`/platform` status page)
 - ✅ Cosmos DB wiring — Learning Journal persists (serverless, keyless/AAD)
-- ⬜ Deploy portal + api to Azure
+- ✅ Deploy portal + api to Azure — App Service (portal) + Function App (api)
 
 ## Phase 1 — 100 users
 - ⬜ Authentication (Entra ID / EasyAuth)

@@ -17,7 +17,7 @@ export async function checkApiHealth(): Promise<ServiceHealth> {
   try {
     const res = await fetch(url, {
       cache: "no-store",
-      signal: AbortSignal.timeout(3000),
+      signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) {
       return { state: "down", error: `HTTP ${res.status}`, url };

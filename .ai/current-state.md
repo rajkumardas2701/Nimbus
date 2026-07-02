@@ -30,12 +30,11 @@ Phase 0 — 10 users. Foundation.
 - Portal: `cd apps/portal; npm run dev` (http://localhost:3000)
 
 ## Next up (Principal Engineer review — reordered)
-1. ✅ ADRs 0002–0005 (Python · App Service · Managed Identity · Cosmos partition key) + `docs/scaling.md`
+1. ✅ ADRs 0002–0006 + `docs/scaling.md` + `docs/nfr.md`; graceful-degradation principle added
 2. **GitHub Actions CI/CD** — make deploys boring (build → deploy → smoke test); no manual ZIPs
 3. Phase 1: **Authentication** (Entra ID / EasyAuth)
-4. Then **AI Assistant** (RAG, Python) → Search
-- Open design challenge (see `docs/scaling.md` Q1): isolate the AI workload so the portal
-  stays responsive under 10× AI traffic, without Kubernetes.
+4. Then **AI Assistant** — async on Functions (ADR-0006): API → Service Bus → AI Worker → Response Store → SignalR
+- Open DDIA question (`docs/scaling.md` Q2): preserve per-conversation ordering with N queue workers (Service Bus sessions?).
 
 ## Key resources (personal subscription)
 - Subscription: Visual Studio Enterprise `e6127a12-...` · tenant `fb3e7b7e-...`

@@ -17,6 +17,9 @@ These are non-negotiable. They exist to stop us from over-building.
 6. **Document the "why".** Every significant decision becomes an ADR under `docs/adr/`.
 7. **Scale is a story, not a number.** Every component records how it changes at
    10 → 100 → 10k → 100k → 1M → 10M users.
+8. **Degrade gracefully.** When a dependency is overloaded or down, the user experience
+   degrades ("assistant busy") — it never fails completely. Isolate failure domains so one
+   capability can't take the platform down.
 
 ## Anti-goals
 

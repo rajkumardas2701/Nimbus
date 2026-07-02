@@ -48,12 +48,12 @@ of the trigger.
 | Scale | Trigger | What we add | DDIA / concept |
 |-------|---------|-------------|----------------|
 | **10** | — | Portal → API → Cosmos, keyless, single region | Reliability, maintainability |
-| **100** | Real users, need identity | **Authentication** (Entra ID / EasyAuth); **CI/CD** so deploys are boring | Boundaries, safe change |
-| **1,000** | AI assistant chatty; repeat questions; OpenAI cost | **Redis** cache (semantic + response); per-user rate limiting; token budgeting | Caching, read scaling |
-| **10,000** | Multiple workloads competing; portal must stay fast | **Container Apps**: split portal / API / AI into independently scaling services; async where possible | Partitioning of *workloads*; back-pressure |
-| **100,000** | Bursts, global users, RU pressure | Front Door + CDN; Cosmos **repartition** by tenant; provisioned throughput / autoscale; queue-based load leveling | Partitioning, derived data, load leveling |
-| **1,000,000** | Regional latency + availability | Multi-region reads; AI gateway (APIM) for quota/caching/fallback models | Replication, leader/follower |
-| **10,000,000** | Regional failure = outage | Active-active multi-region; Cosmos multi-write; **AKS only if a concrete limit forces it** | Consensus, multi-leader, conflict resolution |
+| **100** | Synchronous AI calls couple the portal to a slow, bursty workload | **Async AI on Functions**: API → Service Bus → AI Worker → Response Store; **Auth** (Entra ID); **CI/CD**. *Still just Functions — they already scale independently.* | Queue-based load leveling; failure domains |
+| **1,000** | Repeat prompts + reads raise cost and latency | **Redis** cache (semantic + response); per-user rate limiting; token budgeting | Caching, read scaling |
+| **10,000** | Retrieval quality + query load | **Azure AI Search** (hybrid + vector); *still Functions* | Indexes, derived data |
+| **100,000** | Startup time / custom runtime / long-running workers / multiple APIs | **Azure Container Apps** for specific services (the ADR-0003 trigger fires); Front Door + CDN; Cosmos **repartition** by tenant | Partitioning of *workloads*; back-pressure |
+| **1,000,000** | Regional latency + availability | Multi-region reads; **AI gateway (APIM)** for quota / caching / fallback models | Replication, leader/follower |
+| **10,000,000** | Orchestration / networking needs make k8s the *simplest* option | Active-active multi-region; Cosmos multi-write; **AKS only when it's genuinely simplest** | Consensus, multi-leader, conflict resolution |
 
 ---
 
@@ -66,16 +66,38 @@ of the trigger.
 - **No premature Kubernetes.** AKS appears only with a written trigger.
 - **Isolate workloads before they interfere.** A slow/overloaded AI service must never take
   the portal down (see the open design challenge below).
+- **Degrade gracefully.** A dependency being overloaded or down degrades the experience
+  ("assistant busy") — it never fails the whole platform. Isolate failure domains.
 
 ---
 
 ## Open design questions (Principal Engineer challenges)
 
-### Q1 — Isolate the AI workload (active)
+### Q1 — Isolate the AI workload (resolved → ADR-0006)
 When the AI Assistant goes live it may generate ~10× the portal's traffic (continuous
-chat). **Without introducing Kubernetes**, redesign so the portal stays responsive even if
-the AI service is overloaded. Levers: separate workloads, independent scaling, request
-isolation, async patterns, Azure-native services. _Proposal in progress._
+chat). Decision: keep everything on **Azure Functions** (they already scale independently —
+**no Container Apps yet**) and make AI **asynchronous**:
+
+```
+Portal → API → Command Queue (Service Bus) → AI Worker (Function) → Response Store (Cosmos)
+                                                                     → SignalR (later)
+```
+
+The API enqueues and returns immediately; the worker drains the queue at its own pace
+(load leveling); the portal polls now, streams via SignalR later. Between the API and any
+synchronous dependency we apply a **resilience policy**:
+
+```
+timeout → retry → circuit breaker → fallback ("assistant busy")
+```
+
+### Q2 — Ordering with N workers (DDIA homework, open)
+If 50 AI workers consume one queue, how do we guarantee that messages within a single
+conversation (Chat A: msg1 → msg2 → msg3) are processed **in order**? This is a
+distributed-systems problem, not an Azure one. Leading candidate: **Service Bus sessions**
+— one session per conversation pins its ordered messages to a single worker at a time,
+trading some per-conversation parallelism for ordering. Revisit with DDIA (Partitioning →
+ordering guarantees, logs).
 
 ---
 

@@ -35,7 +35,7 @@ Phase 0 — 10 users. Foundation.
 3. **Authentication** — build as an *identity platform* (identity → tenant → roles → policies via an authorization/policy service), not scattered `if is_admin`. ← next
 4. **Observability** — logs, traces, metrics, correlation IDs (before AI, so AI is debuggable)
 5. Then **AI Assistant** — async on Functions (ADR-0006)
-- Open DDIA questions (`docs/scaling.md`): Q2 per-conversation ordering with N workers; Q3 conversations partition key at 10M (hierarchical `tenantId → conversationId`).
+- Open DDIA questions (`docs/scaling.md`): Q2 ordering with N workers; Q3 conversations key (hierarchical `tenantId → conversationId`, + hot-conversation sharding); Q4 bounded contexts at 1M (service vs container vs collection).
 
 ## Key resources (personal subscription)
 - Subscription: Visual Studio Enterprise `e6127a12-...` · tenant `fb3e7b7e-...`

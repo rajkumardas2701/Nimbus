@@ -68,6 +68,23 @@ of the trigger.
   the portal down (see the open design challenge below).
 - **Degrade gracefully.** A dependency being overloaded or down degrades the experience
   ("assistant busy") — it never fails the whole platform. Isolate failure domains.
+- **Authorization ≠ partitioning.** Authorization enforces *access*; partitioning optimizes
+  *storage and query performance*. Identity → authorization → partitioning are related but
+  evolve independently — never bend a partition key to satisfy a security rule.
+
+## Data model — a key per workload (no universal partition key)
+
+Each container picks the key that matches **its** workload. There is no universal key — that
+realization is the point.
+
+| Container | Partition key | Why |
+|-----------|---------------|-----|
+| AI Conversations | `tenantId` → `conversationId` (hierarchical) | Isolation + spreads a huge tenant; single-partition on the chat hot path |
+| Learning Journal | `userId` | Owned + queried per user |
+| Notifications | `userId` | Delivered + read per user |
+| Telemetry | `service` + `day` (or `tenantId` + `day`) | Time-series; bounded partition size; recent-window reads |
+| Audit | `tenantId` + `day` | Append-only, compliance retention, tenant-scoped |
+| Embeddings | vector store / Search (not a chat container) | ANN search is a different workload entirely |
 
 ---
 
@@ -121,6 +138,42 @@ by the authorization layer (every query carries tenant + RBAC), not by the key a
 
 _If forced to pick one flat key: `/conversationId` — distribution + single-partition chat —
 with a `userId` index for listing._
+
+### Q3 refinements (design-review follow-ups)
+
+- **Sequential conversation IDs re-create a hot partition.** A monotonic/time-based
+  `conversationId` clusters all new writes into the newest key range (the auto-increment
+  anti-pattern, DDIA Ch. 6). Fix: **random/hashed IDs** (GUIDs) so writes spread uniformly;
+  keep time as a *sort* field, never the partition key.
+- **One viral conversation moves the hot partition, doesn't remove it.** `conversationId`
+  puts *all* of a conversation's messages in one logical partition — a 1M-message incident
+  (`INC-2026-001`) blows 20 GB / 10k RU. Fix: **shard the hot conversation** with a synthetic
+  suffix (`conversationId + bucket`, bucket = `hash(messageId) % N` or a time window); reading
+  the whole thread then fans out across buckets — fine, because we page recent messages. No
+  single key is optimal for both a tiny chat and a viral one: design for the common case, add
+  a spill strategy for the tail.
+- **Different facets are different bounded contexts.** Messages, embeddings, summaries, token
+  usage, citations, reactions, and audit logs have different access patterns, lifecycles, and
+  failure domains — they should not share one key or one container.
+
+### Q4 — Service vs database vs collection at 1M users (PE Challenge #3)
+
+Framed by **bounded context · ownership · scaling · failure domain** (not Azure SKUs):
+
+| Data | Boundary | Why |
+|------|----------|-----|
+| Messages + conversation metadata + summaries | **Conversation service**, one container (`tenantId → conversationId`) | Same hot path, read together, one owner |
+| Embeddings + search index | **Retrieval service**, separate vector store | ANN search is a different workload + failure domain; retrieval can degrade while chat lives |
+| Uploaded documents | **Ingestion service**; blobs in Storage + a metadata container | Large binaries aren't Cosmos; separate scan/chunk pipeline |
+| Token usage / metering | Separate container/pipeline (`tenantId + day`) | Append-only time-series for billing; own lifecycle |
+| Audit events | Separate container (`tenantId + day`), restricted access | Compliance retention + isolation; must survive independently |
+
+**Decision rules:** separate **service** when scaling / failure domain / ownership / deploy
+cadence differ (Chat, Retrieval, Ingestion); separate **container/DB** when partition key,
+retention, security, or throughput differ (embeddings, audit, metering); **same container,
+different item type** only when access pattern + lifecycle + key match and they're read
+together. Failure domains: retrieval down → chat still answers (ungrounded); ingestion down →
+no new docs, chat works; audit must be durable and isolated.
 
 ---
 

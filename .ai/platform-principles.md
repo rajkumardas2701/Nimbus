@@ -20,6 +20,10 @@ These are non-negotiable. They exist to stop us from over-building.
 8. **Degrade gracefully.** When a dependency is overloaded or down, the user experience
    degrades ("assistant busy") — it never fails completely. Isolate failure domains so one
    capability can't take the platform down.
+9. **Separate identity, authorization, and data partitioning.** Authorization enforces
+   *access* (who may read/write); partitioning optimizes *storage and query performance*
+   (where data lives). They are related but evolve independently — never bend a partition
+   key to satisfy a security rule.
 
 ## Anti-goals
 

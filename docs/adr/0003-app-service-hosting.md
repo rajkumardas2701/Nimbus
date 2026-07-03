@@ -47,3 +47,10 @@ App Service on a single small plan cannot absorb portal + growing traffic. The e
 path is App Service → Container Apps (independent scaling, scale-to-zero) → AKS (only if a
 concrete platform limit forces it). Front Door + CDN front the static assets long before
 that.
+
+## Triggers to revisit
+
+- We containerize services (Phase 3): startup time, custom runtime, long-running workers,
+  or multiple APIs appear.
+- We need scale-to-zero + independent per-workload scaling (AI isolation) → Container Apps.
+- We need a custom domain, deployment slots, or an SLA the Free tier can't provide.

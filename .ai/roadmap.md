@@ -11,13 +11,13 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started
 
 ## Phase 1 — 100 users
 - ✅ CI/CD — GitHub Actions, keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
-- ⬜ Authentication (Entra ID / EasyAuth)
+- ⬜ Authentication — as an **identity platform** (identity → tenant → roles → policies), not just login
+- ⬜ Observability — structured logs, traces, metrics, correlation IDs (before AI, so AI is debuggable)
 - ⬜ AI Assistant (RAG) — async on Functions (ADR-0006), rewritten in Python
 
 ## Phase 2 — 10,000 users
-- ⬜ Telemetry service
-- ⬜ Notifications service
 - ⬜ Search (Azure AI Search)
+- ⬜ Notifications service
 - ⬜ Documentation app
 
 ## Phase 3 — 100,000 users

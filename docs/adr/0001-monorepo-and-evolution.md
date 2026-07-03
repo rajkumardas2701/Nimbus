@@ -28,3 +28,9 @@ capabilities, Python Azure Functions), `packages/` (shared libraries), and
 - Easy cross-service refactors and shared code.
 - One CI pipeline to reason about early; we add path-filtered workflows as services grow.
 - We must be disciplined about boundaries so the monorepo doesn't become a mud ball.
+
+## Triggers to revisit
+
+- A service needs an independent release cadence, owner, or a compliance boundary.
+- CI/build times balloon as services multiply (path-filtering no longer enough).
+- A capability is spun out to a separate team or product — polyrepo for that piece.

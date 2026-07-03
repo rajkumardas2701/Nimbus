@@ -34,3 +34,9 @@ rewritten in Python when it folds into `services/ai`.
 - Trade-off: Python cold starts on Consumption are a bit higher than .NET; tracked in
   [scaling.md](../scaling.md) with a mitigation path (Premium → Container Apps).
 - One-time cost: rewrite the parked C# prototype in Python for `services/ai`.
+
+## Triggers to revisit
+
+- A service is CPU-bound or latency-critical where .NET / Go / Rust materially wins.
+- Python cold starts remain a hard blocker even on Premium / containers.
+- The team standardizes on a different backend language.

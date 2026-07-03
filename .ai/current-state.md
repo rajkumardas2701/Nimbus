@@ -30,11 +30,12 @@ Phase 0 — 10 users. Foundation.
 - Portal: `cd apps/portal; npm run dev` (http://localhost:3000)
 
 ## Next up (Principal Engineer review — reordered)
-1. ✅ ADRs 0002–0006 + `docs/scaling.md` + `docs/nfr.md`; graceful-degradation principle
-2. ✅ **GitHub Actions CI/CD** — keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
-3. **Phase 1: Authentication** (Entra ID / EasyAuth) ← next
-4. Then **AI Assistant** — async on Functions (ADR-0006): API → Service Bus → AI Worker → Response Store → SignalR
-- Open DDIA question (`docs/scaling.md` Q2): preserve per-conversation ordering with N queue workers (Service Bus sessions?).
+1. ✅ ADRs 0002–0007 (each with a "Triggers to revisit" section) + `scaling.md` + `nfr.md`; graceful-degradation principle
+2. ✅ **CI/CD** — keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
+3. **Authentication** — build as an *identity platform* (identity → tenant → roles → policies via an authorization/policy service), not scattered `if is_admin`. ← next
+4. **Observability** — logs, traces, metrics, correlation IDs (before AI, so AI is debuggable)
+5. Then **AI Assistant** — async on Functions (ADR-0006)
+- Open DDIA questions (`docs/scaling.md`): Q2 per-conversation ordering with N workers; Q3 conversations partition key at 10M (hierarchical `tenantId → conversationId`).
 
 ## Key resources (personal subscription)
 - Subscription: Visual Studio Enterprise `e6127a12-...` · tenant `fb3e7b7e-...`

@@ -46,3 +46,9 @@ partition count. The fix is to **align the partition key with the dominant query
 stay single-partition, and to add composite indexes for multi-field sorts. Partition-key
 choice is the single most consequential Cosmos decision — this ADR exists so we choose it
 deliberately, not by default.
+
+## Triggers to revisit
+
+- Multi-tenancy arrives → partition by `tenantId` (or a hierarchical key).
+- A hot partition, or the 20 GB / 10k-RU logical-partition limit, is approached.
+- Cross-partition RU cost or query latency becomes material.

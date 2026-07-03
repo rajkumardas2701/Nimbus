@@ -44,3 +44,9 @@ The same `DefaultAzureCredential` code runs unchanged in both environments.
 Nothing about this pattern — it scales cleanly. At multi-region/multi-service scale we add
 per-service identities and tighter, resource-scoped role assignments rather than a single
 broad one.
+
+## Triggers to revisit
+
+- A dependency cannot authenticate with Entra ID (forces a secret in Key Vault).
+- Cross-tenant or non-Azure workloads need Workload Identity Federation.
+- Compliance requires customer-managed / HSM-backed keys.

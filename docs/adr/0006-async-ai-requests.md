@@ -58,3 +58,9 @@ With N workers draining one queue, how do we preserve **per-conversation orderin
 (Chat A: msg1 → msg2 → msg3)? This is a distributed-systems problem, not an Azure one.
 Leading candidate: **Service Bus sessions** — one session per conversation pins its ordered
 messages to a single worker at a time. Tracked as `scaling.md` Q2.
+
+## Triggers to revisit
+
+- A use case needs synchronous, ultra-low-latency AI responses.
+- Ordering needs exceed Service Bus sessions → Event Hubs / Kafka partitions.
+- Streaming becomes the primary UX (promote SignalR from "later" to now).

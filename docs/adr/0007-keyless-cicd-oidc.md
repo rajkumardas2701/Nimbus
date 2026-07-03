@@ -52,3 +52,10 @@ Use **GitHub Actions with OIDC federated credentials**:
 Nothing structural — CI/CD scales. As services multiply we split into path-filtered
 per-service workflows, add environments (staging → prod) with approvals, and layer in
 automated rollback on a failed smoke test.
+
+## Triggers to revisit
+
+- Multiple environments (staging → prod) with approval gates.
+- Multi-region deployment, or blue/green + automated rollback.
+- Self-hosted runners, or supply-chain signing / provenance (SLSA) requirements.
+- Per-service workflows as services multiply.

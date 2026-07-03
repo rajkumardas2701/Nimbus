@@ -99,6 +99,29 @@ distributed-systems problem, not an Azure one. Leading candidate: **Service Bus 
 trading some per-conversation parallelism for ordering. Revisit with DDIA (Partitioning →
 ordering guarantees, logs).
 
+### Q3 — Partition key for AI Conversations at 10M users (PE Challenge #2)
+Multi-tenant and highly skewed: Microsoft (300k users), Contoso (500), Fabrikam (40).
+Candidates: `/userId`, `/tenantId`, `/conversationId`, or a hierarchical key.
+
+- **`/tenantId`** — best tenant isolation, but a **hot partition**: Microsoft's 300k users
+  all land in one logical partition and blow the 20 GB / 10k-RU cap. Skew makes it a dead end.
+- **`/userId`** — spreads better; "my conversations" is single-partition. But a power user's
+  history can still grow large, and cross-tenant admin queries fan out.
+- **`/conversationId`** — **maximal distribution, no hot partition even for a huge tenant**,
+  and the dominant hot path (append/read messages *within one conversation*) is
+  **single-partition**. Weakness: "list all my conversations" fans out.
+
+**Answer:** use a **hierarchical partition key `/tenantId` → `/conversationId`** (Cosmos
+supports up to 3 levels). Tenant-level grouping gives isolation and efficient tenant-scoped
+queries, while sub-partitioning by `conversationId` **spreads a giant tenant across many
+physical partitions** (kills the hot partition) and keeps a conversation's messages
+single-partition on the hot path. Serve the "list my conversations" sidebar from a small
+**derived index keyed by `userId`** (materialized view — DDIA). Tenant isolation is enforced
+by the authorization layer (every query carries tenant + RBAC), not by the key alone.
+
+_If forced to pick one flat key: `/conversationId` — distribution + single-partition chat —
+with a `userId` index for listing._
+
 ---
 
-_Last updated: 2026-07-02 · Phase 0 complete._
+_Last updated: 2026-07-03 · Phase 0.5 complete (CI/CD)._

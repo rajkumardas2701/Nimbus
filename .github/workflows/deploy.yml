@@ -47,7 +47,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: Publish Function App (remote build)
         working-directory: services/api
-        run: func azure functionapp publish nimbus-platform-api --build remote
+        run: func azure functionapp publish nimbus-platform-api --python --build remote
 
   deploy-portal:
     needs: changes

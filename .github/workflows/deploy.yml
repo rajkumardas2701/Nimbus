@@ -1,0 +1,104 @@
+name: Deploy Nimbus
+
+# Deployment should be boring: every push to main builds, deploys only what changed,
+# and smoke-tests the result. Auth is keyless (OIDC federated credentials) — no secrets.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write # required for OIDC azure/login
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      portal: ${{ steps.filter.outputs.portal }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'services/api/**'
+            portal:
+              - 'apps/portal/**'
+
+  deploy-api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy Function App (remote build)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: nimbus-platform-api
+          package: services/api
+          scm-do-build-during-deployment: true
+          enable-oryx-build: true
+
+  deploy-portal:
+    needs: changes
+    if: needs.changes.outputs.portal == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/portal/package-lock.json
+      - name: Install & build (standalone)
+        working-directory: apps/portal
+        run: |
+          npm ci
+          npm run build
+      - name: Assemble standalone package
+        working-directory: apps/portal
+        run: |
+          cp -r public .next/standalone/public
+          mkdir -p .next/standalone/.next/static
+          cp -r .next/static/. .next/standalone/.next/static/
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: nimbus-portal
+          package: apps/portal/.next/standalone
+
+  smoke-test:
+    needs: [deploy-api, deploy-portal]
+    if: always() && (needs.deploy-api.result == 'success' || needs.deploy-portal.result == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: API /health
+        run: |
+          echo "Probing API health (with retries for cold start)..."
+          curl -fsS --retry 6 --retry-all-errors --retry-delay 10 \
+            https://nimbus-platform-api.azurewebsites.net/api/health
+          echo ""
+      - name: Portal home
+        run: |
+          echo "Probing portal home..."
+          code=$(curl -sS --retry 6 --retry-all-errors --retry-delay 10 \
+            -o /dev/null -w "%{http_code}" https://nimbus-portal.azurewebsites.net/)
+          echo "portal HTTP $code"
+          test "$code" = "200"

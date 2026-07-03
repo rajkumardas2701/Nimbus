@@ -10,8 +10,9 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started
 - ✅ Deploy portal + api to Azure — App Service (portal) + Function App (api)
 
 ## Phase 1 — 100 users
+- ✅ CI/CD — GitHub Actions, keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
 - ⬜ Authentication (Entra ID / EasyAuth)
-- ⬜ AI Assistant (RAG) — fold in the parked prototype, rewritten in Python
+- ⬜ AI Assistant (RAG) — async on Functions (ADR-0006), rewritten in Python
 
 ## Phase 2 — 10,000 users
 - ⬜ Telemetry service

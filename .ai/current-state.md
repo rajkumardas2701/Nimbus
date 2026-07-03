@@ -5,7 +5,7 @@ _Update this whenever focus changes. The agent reads this first._
 **Last updated:** 2026-07-02
 
 ## Current focus
-Phase 0 COMPLETE — portal + API + Cosmos deployed to Azure. Next: ADRs, then Phase 1 auth.
+Phase 1 started. CI/CD live (keyless OIDC). Next: Authentication (Entra ID / EasyAuth).
 
 ## Phase
 Phase 0 — 10 users. Foundation.
@@ -30,9 +30,9 @@ Phase 0 — 10 users. Foundation.
 - Portal: `cd apps/portal; npm run dev` (http://localhost:3000)
 
 ## Next up (Principal Engineer review — reordered)
-1. ✅ ADRs 0002–0006 + `docs/scaling.md` + `docs/nfr.md`; graceful-degradation principle added
-2. **GitHub Actions CI/CD** — make deploys boring (build → deploy → smoke test); no manual ZIPs
-3. Phase 1: **Authentication** (Entra ID / EasyAuth)
+1. ✅ ADRs 0002–0006 + `docs/scaling.md` + `docs/nfr.md`; graceful-degradation principle
+2. ✅ **GitHub Actions CI/CD** — keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
+3. **Phase 1: Authentication** (Entra ID / EasyAuth) ← next
 4. Then **AI Assistant** — async on Functions (ADR-0006): API → Service Bus → AI Worker → Response Store → SignalR
 - Open DDIA question (`docs/scaling.md` Q2): preserve per-conversation ordering with N queue workers (Service Bus sessions?).
 

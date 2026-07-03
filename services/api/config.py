@@ -3,7 +3,7 @@
 import os
 
 SERVICE_NAME = "nimbus-api"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 # Cosmos DB — keyless (AAD) access via DefaultAzureCredential.
 COSMOS_ENDPOINT = os.environ.get("COSMOS_ENDPOINT", "")

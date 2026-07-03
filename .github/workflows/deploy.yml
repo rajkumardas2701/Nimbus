@@ -31,29 +31,27 @@ jobs:
 
   deploy-api:
     needs: changes
-    if: needs.changes.outputs.api == 'true'
+    if: needs.changes.outputs.api == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install Azure Functions Core Tools
+        run: npm i -g azure-functions-core-tools@4 --unsafe-perm true
       - uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: Deploy Function App (remote build)
-        uses: Azure/functions-action@v1
-        with:
-          app-name: nimbus-platform-api
-          package: services/api
-          scm-do-build-during-deployment: true
-          enable-oryx-build: true
+      - name: Publish Function App (remote build)
+        working-directory: services/api
+        run: func azure functionapp publish nimbus-platform-api --build remote
 
   deploy-portal:
     needs: changes
-    if: needs.changes.outputs.portal == 'true'
+    if: needs.changes.outputs.portal == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -89,16 +87,18 @@ jobs:
     if: always() && (needs.deploy-api.result == 'success' || needs.deploy-portal.result == 'success')
     runs-on: ubuntu-latest
     steps:
+      - name: Wait for apps to warm up
+        run: sleep 25
       - name: API /health
         run: |
-          echo "Probing API health (with retries for cold start)..."
-          curl -fsS --retry 6 --retry-all-errors --retry-delay 10 \
+          echo "Probing API health (patient retries for cold start after deploy)..."
+          curl -fsS --retry 12 --retry-all-errors --retry-delay 15 \
             https://nimbus-platform-api.azurewebsites.net/api/health
           echo ""
       - name: Portal home
         run: |
           echo "Probing portal home..."
-          code=$(curl -sS --retry 6 --retry-all-errors --retry-delay 10 \
+          code=$(curl -sS --retry 12 --retry-all-errors --retry-delay 15 \
             -o /dev/null -w "%{http_code}" https://nimbus-portal.azurewebsites.net/)
           echo "portal HTTP $code"
           test "$code" = "200"

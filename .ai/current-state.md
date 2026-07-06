@@ -5,7 +5,7 @@ _Update this whenever focus changes. The agent reads this first._
 **Last updated:** 2026-07-02
 
 ## Current focus
-Phase 1 started. CI/CD live (keyless OIDC). Next: Authentication (Entra ID / EasyAuth).
+Phase 1. Auth shipped (identity platform). Next: Observability (before AI).
 
 ## Phase
 Phase 0 — 10 users. Foundation.
@@ -32,8 +32,8 @@ Phase 0 — 10 users. Foundation.
 ## Next up (Principal Engineer review — reordered)
 1. ✅ ADRs 0002–0007 (each with a "Triggers to revisit" section) + `scaling.md` + `nfr.md`; graceful-degradation principle
 2. ✅ **CI/CD** — keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
-3. **Authentication** — build as an *identity platform* (identity → tenant → roles → policies via an authorization/policy service), not scattered `if is_admin`. ← next
-4. **Observability** — logs, traces, metrics, correlation IDs (before AI, so AI is debuggable)
+3. ✅ **Authentication** — identity platform: EasyAuth (Entra ID, allow-anonymous), `NimbusUser`, policy layer (`can(user, policy)`, one policy), `/account` page (ADR-0009)
+4. **Observability** — logs, traces, metrics, correlation IDs (before AI, so AI is debuggable) ← next
 5. Then **AI Assistant** — async on Functions (ADR-0006)
 - Open DDIA questions (`docs/scaling.md`): Q2 ordering with N workers; Q3 conversations key (hierarchical `tenantId → conversationId`, + hot-conversation sharding); Q4 bounded contexts at 1M (service vs container vs collection); Q5 5 GB PDF ingestion (fairness, staged pipeline, resumability, idempotency, durable intent).
 

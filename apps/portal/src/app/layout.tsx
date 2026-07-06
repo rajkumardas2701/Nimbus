@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Brand } from "@/components/Brand";
 import { Nav } from "@/components/Nav";
+import { AccountChip } from "@/components/AccountChip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,13 +39,16 @@ export default function RootLayout({
           <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-8 border-r border-white/5 px-4 py-6 lg:flex">
             <Brand />
             <Nav />
-            <div className="mt-auto rounded-lg border border-white/5 bg-ink-900/40 px-3 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600">
-                Phase 0
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                Foundation · targeting 10 users
-              </p>
+            <div className="mt-auto flex flex-col gap-3">
+              <AccountChip />
+              <div className="rounded-lg border border-white/5 bg-ink-900/40 px-3 py-3">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-slate-600">
+                  Phase 1
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Identity · targeting 100 users
+                </p>
+              </div>
             </div>
           </aside>
 

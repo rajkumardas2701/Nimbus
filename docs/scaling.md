@@ -175,6 +175,37 @@ different item type** only when access pattern + lifecycle + key match and they'
 together. Failure domains: retrieval down → chat still answers (ungrounded); ingestion down →
 no new docs, chat works; audit must be durable and isolated.
 
+> **Evolution note:** summaries start co-located in the conversation container, but as every
+> AI response updates conversation + summary + title + suggested prompts, those writes pile
+> onto one partition. When that contention shows up, summaries graduate to their own bounded
+> context: `Conversation → Summary Worker → Summary container`. We evolve there; we don't
+> start there.
+
+### Q5 — 5 GB PDF ingestion at 5M users / 2,000 tenants (PE Challenge #4)
+
+1. **Isolation / fairness.** Never process whole documents through one FIFO queue — a 5 GB doc
+   head-of-line-blocks everyone. Make the **unit of work a chunk**, not a document, so a giant
+   doc becomes many small items interleaved with others. Add **per-tenant fair scheduling**
+   (Service Bus sessions or per-tenant/tier queues, round-robin) and **per-tenant concurrency
+   caps** so no tenant monopolizes workers; route very large docs to a throttled **bulk lane**
+   (bulkhead), keeping the small-doc lane fast.
+2. **Stages, not one worker.** Chunking (CPU/parse), embedding (network + OpenAI-throttled),
+   and indexing (search I/O) have different resource profiles, scaling needs, and failure
+   modes. Separate them into **event-driven stages** so the throttled stage (embedding) scales
+   independently and one failure doesn't force redoing the others.
+3. **Resumable without duplication.** Checkpoint at the **chunk** level with **deterministic
+   chunk ids** (`docId + chunkIndex` or content hash) and per-chunk state
+   (pending/embedded/indexed). On retry, skip finished chunks; dead-letter poison chunks after
+   N tries so the rest of the doc still completes (partial progress).
+4. **Idempotency keys** wherever at-least-once delivery meets a side effect: dedup **upload by
+   content hash** (same file → same docId), **chunk id** for idempotent embed + index upserts,
+   and **Service Bus duplicate detection** on the work-item id.
+5. **Sync vs event-driven.** Only the **upload accept** is synchronous — validate, land the
+   blob, return `202` + a tracking id. Everything heavy is **event-driven**
+   (`UploadAccepted → ChunkCreated → EmbeddingGenerated → Indexed → DocumentReady`), with
+   progress via polling/SignalR. **Durable intent:** the upload is accepted and *will* complete
+   even if embedding is throttled or OpenAI is down — the queue replays on recovery.
+
 ---
 
-_Last updated: 2026-07-03 · Phase 0.5 complete (CI/CD)._
+_Last updated: 2026-07-06 · Phase 0.5 complete (CI/CD)._

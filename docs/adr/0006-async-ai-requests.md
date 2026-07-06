@@ -52,6 +52,14 @@ Portal → API → Command Queue (Service Bus) → AI Worker (Function) → Resp
 - Establishes NFRs for the AI path (see [nfr.md](../nfr.md)): portal < 2s, AI < 20s, portal
   stays available even when AI is down.
 
+## Durable intent
+
+The user's **intent survives downstream failure**. The moment the API accepts a message it is
+persisted and enqueued — so if Azure OpenAI is down, the request isn't lost: it waits in the
+queue and is **replayed on recovery**, and the user eventually gets an answer. Persisting the
+conversation/command *before* calling the model is what makes the AI path a **degraded mode**
+("answer pending") rather than an outright failure.
+
 ## Open distributed-systems question (DDIA)
 
 With N workers draining one queue, how do we preserve **per-conversation ordering**

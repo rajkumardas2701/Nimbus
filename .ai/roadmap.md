@@ -19,6 +19,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started
 - ⬜ Search (Azure AI Search)
 - ⬜ Notifications service
 - ⬜ Documentation app
+- ⬜ Platform Bus (event backbone) — domain events; services subscribe (telemetry, notifications, audit, search) [ADR-0008, proposed]
 
 ## Phase 3 — 100,000 users
 - ⬜ Dockerize services

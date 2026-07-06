@@ -24,6 +24,12 @@ These are non-negotiable. They exist to stop us from over-building.
    *access* (who may read/write); partitioning optimizes *storage and query performance*
    (where data lives). They are related but evolve independently — never bend a partition
    key to satisfy a security rule.
+10. **Optimize for the common case.** Design the base architecture for the typical workload;
+    when an edge case becomes common, add a *targeted spill strategy* rather than complicating
+    the base for everyone.
+11. **Build for consumers.** Every capability is a contract another team could depend on — an
+    API, an event, an SDK — versioned and documented. We build services other apps consume,
+    not one-off pages.
 
 ## Anti-goals
 

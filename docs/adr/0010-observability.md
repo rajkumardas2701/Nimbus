@@ -49,3 +49,12 @@ correlation IDs**. Our tech stack commits to "Application Insights → OpenTelem
 - We swap the telemetry backend → change the **OTel exporter** only (instrumentation stays).
 - The AI pipeline needs **span-level** tracing across the queue → propagate context through
   Service Bus messages.
+
+## Known refinement
+
+Portal → API calls are traced as **dependencies** and correlated via an explicit
+`x-correlation-id` (logged + echoed by the API). However, the Python Functions request does
+not yet inherit the portal's W3C `operation_Id`, so the two tiers don't auto-stitch into a
+single App Insights transaction. Closing this means adding **OpenTelemetry instrumentation to
+the Functions worker** (honoring inbound `traceparent`) — a deliberate follow-up, not a
+Phase-1 blocker, since the explicit correlation id already ties the logs together.

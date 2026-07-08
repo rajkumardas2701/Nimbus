@@ -12,7 +12,7 @@ Legend: ✅ done · 🟡 in progress · ⬜ not started
 ## Phase 1 — 100 users
 - ✅ CI/CD — GitHub Actions, keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
 - ✅ Authentication — identity platform: EasyAuth (Entra ID, allow-anonymous) + policy layer (ADR-0009)
-- ⬜ Observability — structured logs, traces, metrics, correlation IDs (before AI, so AI is debuggable)
+- ✅ Observability — App Insights + OpenTelemetry; correlation IDs portal → API (ADR-0010)
 - ⬜ AI Assistant (RAG) — async on Functions (ADR-0006), rewritten in Python
 
 ## Phase 2 — 10,000 users

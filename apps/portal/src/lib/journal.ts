@@ -1,3 +1,5 @@
+import { newCorrelationId, logServer } from "./observability";
+
 export type JournalEntry = {
   id: string;
   title: string;
@@ -37,10 +39,12 @@ const localFallback: JournalEntry[] = [
 
 /** Reads journal entries through the Platform API, falling back to local content. */
 export async function getJournalEntries(): Promise<JournalResult> {
+  const correlationId = newCorrelationId();
   try {
     const res = await fetch(`${API_BASE}/api/journal`, {
       cache: "no-store",
       signal: AbortSignal.timeout(8000),
+      headers: { "x-correlation-id": correlationId },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = (await res.json()) as { entries: JournalEntry[] };
@@ -48,7 +52,9 @@ export async function getJournalEntries(): Promise<JournalResult> {
       return { entries: localFallback, source: "local" };
     }
     return { entries: data.entries, source: "api" };
-  } catch {
+  } catch (err) {
+    const error = err instanceof Error ? err.message : "unreachable";
+    logServer("api.journal.fallback", { correlationId, error });
     return { entries: localFallback, source: "local" };
   }
 }

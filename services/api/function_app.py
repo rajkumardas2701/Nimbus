@@ -15,6 +15,7 @@ from clients import get_cosmos_client
 from models import JournalEntryCreate
 from repositories.journal_repository import JournalRepository
 from services.journal_service import JournalService
+from observability import observed
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -35,21 +36,23 @@ def _journal_service() -> JournalService:
 
 
 @app.route(route="health", methods=["GET"])
+@observed("health")
 def health(req: func.HttpRequest) -> func.HttpResponse:
     """Liveness contract shared by every Nimbus service."""
-    logger.info(json.dumps({"event": "health_check", "service": SERVICE_NAME}))
     return _json_response(
         {"status": "ok", "service": SERVICE_NAME, "version": VERSION}
     )
 
 
 @app.route(route="journal", methods=["GET"])
+@observed("journal.list")
 def journal_list(req: func.HttpRequest) -> func.HttpResponse:
     entries = _journal_service().list_entries()
     return _json_response({"entries": entries})
 
 
 @app.route(route="journal", methods=["POST"])
+@observed("journal.create")
 def journal_create(req: func.HttpRequest) -> func.HttpResponse:
     try:
         data = JournalEntryCreate.model_validate_json(req.get_body())

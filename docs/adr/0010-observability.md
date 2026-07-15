@@ -58,3 +58,13 @@ not yet inherit the portal's W3C `operation_Id`, so the two tiers don't auto-sti
 single App Insights transaction. Closing this means adding **OpenTelemetry instrumentation to
 the Functions worker** (honoring inbound `traceparent`) — a deliberate follow-up, not a
 Phase-1 blocker, since the explicit correlation id already ties the logs together.
+
+Live verification on 2026-07-15 confirmed both cloud roles are ingesting telemetry and explicit
+correlation IDs are searchable. It also found that Cosmos operations do **not** appear as
+dependencies, despite Functions/Application Insights integration. Treat Cosmos dependency
+instrumentation as an open gap: add Azure SDK OpenTelemetry tracing without duplicating request
+telemetry, then verify it with the standard Cosmos dependency query.
+
+The production API now has a three-location standard availability test plus enabled availability
+and failed-request alerts. Notification actions remain empty until a Nimbus Action Group and
+destination are chosen.

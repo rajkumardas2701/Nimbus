@@ -1,0 +1,25 @@
+// Recent failed requests, exceptions, and structured request.error events.
+union isfuzzy=true
+(
+    requests
+    | where timestamp > ago(24h) and success == false
+    | project timestamp, itemType, cloud_RoleName, operation_Id, name,
+        detail = strcat("HTTP ", resultCode), customDimensions
+),
+(
+    exceptions
+    | where timestamp > ago(24h)
+    | project timestamp, itemType, cloud_RoleName, operation_Id,
+        name = type, detail = outerMessage, customDimensions
+),
+(
+    traces
+    | where timestamp > ago(24h)
+    | extend dimensions = todynamic(customDimensions)
+    | where message has '"event": "request.error"'
+        or message has '"event":"request.error"'
+    | project timestamp, itemType, cloud_RoleName, operation_Id,
+        name = "request.error", detail = message, customDimensions
+)
+| order by timestamp desc
+| take 200

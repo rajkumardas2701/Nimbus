@@ -1,0 +1,10 @@
+// Replace the value with x-correlation-id from a portal/API response or structured log.
+let correlationId = "REPLACE_CORRELATION_ID";
+union isfuzzy=true requests, dependencies, traces, exceptions
+| extend dimensions = todynamic(customDimensions)
+| where operation_Id == correlationId
+    or tostring(dimensions.correlationId) == correlationId
+    or message has correlationId
+| project timestamp, itemType, cloud_RoleName, operation_Id, name, message,
+    success, resultCode, duration, target, customDimensions
+| order by timestamp asc

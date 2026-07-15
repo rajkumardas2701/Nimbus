@@ -1,0 +1,5 @@
+// Fast check that each telemetry type is arriving and identify its latest timestamp.
+union withsource=tableName isfuzzy=true requests, dependencies, traces, exceptions
+| where timestamp > ago(24h)
+| summarize count = count(), latest = max(timestamp) by tableName, cloud_RoleName
+| order by cloud_RoleName asc, tableName asc

@@ -7,8 +7,9 @@ gradually**, exactly like a real engineering organization.
 
 ## Operating rules
 
-1. **Read the brain before acting.** Start with `.ai/current-state.md`, then
-   `.ai/roadmap.md`. Consult `.ai/architecture.md`, `.ai/tech-stack.md`,
+1. **Read the brain before acting.** Start with `.ai/project-context.md`, then
+   `.ai/current-state.md`, `.ai/handoff.md`, and `.ai/roadmap.md`. Consult
+   `.ai/principal-engineer.md`, `.ai/architecture.md`, `.ai/tech-stack.md`,
    `.ai/coding-guidelines.md`, and `.ai/platform-principles.md` as needed.
 2. **Do not introduce Kubernetes, microservices, service mesh, or event sourcing
    until the roadmap phase justifies it.** If you think we need it early, argue for it
@@ -21,6 +22,8 @@ gradually**, exactly like a real engineering organization.
    with a documented path to the next.
 7. **Update `.ai/current-state.md`** when the focus changes, and add an ADR under
    `docs/adr/` for significant decisions.
+8. **Leave a handoff.** Update `.ai/handoff.md` when active work, blockers, or the immediate
+   next action changes. Record durable engineering lessons in `docs/engineering-journal.md`.
 
 ## Language policy
 - `apps/` and `packages/` → TypeScript (Next.js, strict mode).

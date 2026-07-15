@@ -1,0 +1,12 @@
+// Cosmos dependency volume, latency, and failures from the Platform API.
+dependencies
+| where timestamp > ago(24h)
+| where type has "Azure DocumentDB" or target has "documents.azure.com"
+| summarize
+    calls = count(),
+    failures = countif(success == false),
+    failureRate = round(100.0 * countif(success == false) / count(), 2),
+    p50Ms = percentile(duration, 50),
+    p95Ms = percentile(duration, 95)
+    by cloud_RoleName, target, resultCode, bin(timestamp, 15m)
+| order by timestamp desc

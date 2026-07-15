@@ -6,9 +6,11 @@ decisions.
 
 ## Read first (in this order)
 1. [.ai/prompt.md](../.ai/prompt.md) — your operating persona and rules
-2. [.ai/current-state.md](../.ai/current-state.md) — what we're doing right now
-3. [.ai/roadmap.md](../.ai/roadmap.md) — the phase we're in
-4. [.ai/architecture.md](../.ai/architecture.md), [.ai/tech-stack.md](../.ai/tech-stack.md),
+2. [.ai/project-context.md](../.ai/project-context.md) — stable project map and ADR index
+3. [.ai/current-state.md](../.ai/current-state.md) — durable platform status
+4. [.ai/handoff.md](../.ai/handoff.md) — active task, risks, and immediate next action
+5. [.ai/roadmap.md](../.ai/roadmap.md) — the phase we're in
+6. [.ai/architecture.md](../.ai/architecture.md), [.ai/tech-stack.md](../.ai/tech-stack.md),
    [.ai/coding-guidelines.md](../.ai/coding-guidelines.md),
    [.ai/platform-principles.md](../.ai/platform-principles.md)
 
@@ -35,5 +37,8 @@ docs/          docs + ADRs (docs/adr/)
 
 ## Housekeeping
 - Update [.ai/current-state.md](../.ai/current-state.md) when focus changes.
+- Update [.ai/handoff.md](../.ai/handoff.md) when active work changes or before ending a
+  substantial session.
+- Add durable lessons to [docs/engineering-journal.md](../docs/engineering-journal.md).
 - Add an ADR in `docs/adr/` for significant decisions.
 - Conventional commits. Never commit secrets.

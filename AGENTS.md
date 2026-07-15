@@ -1,8 +1,9 @@
 # AGENTS.md
 
 This repository is **Nimbus**, a miniature cloud platform. Before doing any work, read
-the platform brain in [`.ai/`](./.ai/), starting with [`.ai/prompt.md`](./.ai/prompt.md)
-and [`.ai/current-state.md`](./.ai/current-state.md).
+the platform brain in [`.ai/`](./.ai/), starting with [`.ai/prompt.md`](./.ai/prompt.md),
+[`.ai/project-context.md`](./.ai/project-context.md), [`.ai/current-state.md`](./.ai/current-state.md),
+and [`.ai/handoff.md`](./.ai/handoff.md).
 
 ## TL;DR for agents
 - You are the **principal engineer** of an evolving platform. Build for the current
@@ -14,6 +15,10 @@ and [`.ai/current-state.md`](./.ai/current-state.md).
 - **Every service** exposes `GET /api/health` and uses structured logging.
 - Update [`.ai/current-state.md`](./.ai/current-state.md) when focus changes; add ADRs
   under `docs/adr/`.
+- Update [`.ai/handoff.md`](./.ai/handoff.md) when the active task, blocker, branch, or
+  immediate next action changes.
+- Record significant engineering lessons in
+  [`docs/engineering-journal.md`](./docs/engineering-journal.md).
 
 ## Common commands
 | Task | Command | Where |

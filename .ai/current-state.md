@@ -2,13 +2,14 @@
 
 _Update this whenever focus changes. The agent reads this first._
 
-**Last updated:** 2026-07-02
+**Last updated:** 2026-07-14
 
 ## Current focus
-Phase 1: Observability done (App Insights + OTel, correlation IDs). Next: AI Assistant (async, ADR-0006).
+Phase 1 kickoff: AI Assistant async MVP (ADR-0006) — queue + worker + response store + portal polling.
 
 ## Phase
-Phase 0 — 10 users. Foundation.
+Phase 1 — 100 users. Identity is complete; the observability foundation is hardened; AI
+Assistant is in progress.
 
 ## What exists
 - Monorepo skeleton + `.ai/` brain docs
@@ -33,9 +34,15 @@ Phase 0 — 10 users. Foundation.
 1. ✅ ADRs 0002–0007 (each with a "Triggers to revisit" section) + `scaling.md` + `nfr.md`; graceful-degradation principle
 2. ✅ **CI/CD** — keyless OIDC, path-filtered deploy + smoke test (ADR-0007)
 3. ✅ **Authentication** — identity platform: EasyAuth (Entra ID, allow-anonymous), `NimbusUser`, policy layer (`can(user, policy)`, one policy), `/account` page (ADR-0009)
-4. ✅ **Observability** — App Insights + OpenTelemetry; `@observed` API decorator + correlation IDs portal → API (ADR-0010)
+4. ✅ **Observability foundation** — App Insights + OpenTelemetry; `@observed` API decorator,
+   correlation IDs portal → API, focused tests, KQL runbook, API availability test, and failed-
+   request alert (ADR-0010). Open refinement: Cosmos dependency spans are not currently emitted.
 5. Then **AI Assistant** — async on Functions (ADR-0006) ← next
 - Open DDIA questions (`docs/scaling.md`): Q2 ordering with N workers; Q3 conversations key (hierarchical `tenantId → conversationId`, + hot-conversation sharding); Q4 bounded contexts at 1M (service vs container vs collection); Q5 5 GB PDF ingestion (fairness, staged pipeline, resumability, idempotency, durable intent).
+
+## Resume plan (next 1-2 weeks)
+- See `docs/phase1-ai-assistant-resume-plan.md` for task-by-task execution with acceptance criteria.
+- Keep Phase discipline: no containers/Kubernetes yet; stay managed-first on Functions + Service Bus + Cosmos.
 
 ## Key resources (personal subscription)
 - Subscription: Visual Studio Enterprise `e6127a12-...` · tenant `fb3e7b7e-...`

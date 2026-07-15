@@ -38,6 +38,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+      - name: Install API dependencies and test
+        working-directory: services/api
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pytest -q
       - name: Install Azure Functions Core Tools
         run: npm i -g azure-functions-core-tools@4 --unsafe-perm true
       - uses: azure/login@v2
